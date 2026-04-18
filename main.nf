@@ -5,7 +5,6 @@ nextflow.enable.dsl = 2
 	params.pod5	= "$baseDir/pod5/"
 	params.results	= "OUTPUT"
 	params.ref = "$baseDir"
-	params.list = "$baseDir/samples.csv"
     params.run_6mA = false
     params.run_4mC = false
     params.run_5mCG = false
@@ -16,6 +15,7 @@ nextflow.enable.dsl = 2
     params.mapping_4mC = false
     params.mapping_5mCG = false
     params.mapping_5mC = false
+    params.list = params.list ?: "$baseDir/samples.csv"
 
 include {
     BASECALLER;
