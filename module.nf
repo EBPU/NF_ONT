@@ -9,7 +9,7 @@ output:
 	val 'done', emit:done
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --kit-name SQK-NBD114-96  > dorado_basecalled.bam
+dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --kit-name SQK-NBD114-96  > dorado_basecalled.bam
 """
 }
 
@@ -26,7 +26,7 @@ output:
 script:
 """
 mkdir -p excluded/
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado demux --emit-fastq --output-dir demuxed --kit-name SQK-NBD114-96 ${bam_file}
+dorado demux --emit-fastq --output-dir demuxed --kit-name SQK-NBD114-96 ${bam_file}
 mv demuxed/*/*/*/*/*/*.fastq .
 
 declare -A SAMPLE_MAP
