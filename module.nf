@@ -4,12 +4,13 @@ publishDir 'basecall', mode:'copy'
 
 input:
 	path pod5_dir
+	val kit
 output:
 	path("dorado_basecalled.bam"), emit:bam
 	val 'done', emit:done
 script:
 """
-dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --kit-name SQK-NBD114-96  > dorado_basecalled.bam
+dorado basecaller /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --kit-name ${kit}  > dorado_basecalled.bam
 """
 }
 
@@ -26,8 +27,8 @@ output:
 script:
 """
 mkdir -p excluded/
-dorado demux --emit-fastq --output-dir demuxed --kit-name SQK-NBD114-96 ${bam_file}
-mv demuxed/*.fastq .
+dorado demux --emit-fastq --output-dir demuxed --no-classify ${bam_file} 
+mv demuxed/*/*/*/*/*/*.fastq .
 
 declare -A SAMPLE_MAP
 while IFS=';' read -r bc_num sample_name; do
@@ -501,7 +502,6 @@ output:
     val 'done', emit: done
 script:
 """
-source /idle/ric.cirillo/envs/spitaleri.andrea/python3-venv/bin/activate
 NanoComp --threads ${task.cpus} --tsv_stats --fastq ${fastq_gz}
 """
 }

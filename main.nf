@@ -3,6 +3,7 @@ nextflow.enable.dsl = 2
  * Define the default parameters
  */ 
 	params.pod5	= "$baseDir/pod5/"
+	params.kit = "SQK-NBD114-96"
 	params.results	= "OUTPUT"
 	params.ref = "$baseDir"
     params.run_6mA = false
@@ -44,7 +45,7 @@ include {
 	} from "$baseDir/module.nf"
 workflow {
     samp_ch = Channel.fromPath(params.list)
-    basecaller_out = BASECALLER(params.pod5)
+    basecaller_out = BASECALLER(params.pod5,params.kit)
     demultiplex_out = DEMULTIPLEX(basecaller_out.bam,samp_ch)
     reads_with_id = demultiplex_out.fastq_gz
     .flatten()
