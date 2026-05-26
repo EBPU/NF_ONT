@@ -27,7 +27,7 @@ script:
 """
 mkdir -p excluded/
 dorado demux --emit-fastq --output-dir demuxed --kit-name SQK-NBD114-96 ${bam_file}
-mv demuxed/*/*/*/*/*/*.fastq .
+mv demuxed/*.fastq .
 
 declare -A SAMPLE_MAP
 while IFS=';' read -r bc_num sample_name; do
