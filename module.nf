@@ -1,5 +1,6 @@
 process BASECALLER {
 clusterOptions "--partition cuda --gres=gpu:1"
+containerOptions "--nv"
 publishDir 'basecall', mode:'copy'
 
 input:
