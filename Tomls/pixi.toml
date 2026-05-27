@@ -1,0 +1,23 @@
+[workspace]
+authors = ["allen <dimarco.federico@hsr.it>"]
+channels = ["conda-forge", "bioconda", "nvidia"]
+name = "ont_tools"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+download-tool = { cmd = "curl -L -o mytool.tar.gz https://cdn.oxfordnanoportal.com/software/analysis/dorado-2.0.0-linux-x64.tar.gz", outputs = ["mytool.tar.gz"] }
+
+setup-tool = { cmd = "mkdir -p .pixi/envs/default/down/ &&  tar -xzf mytool.tar.gz -C .pixi/envs/default/down && cd .pixi/envs/default/bin && ln -s ../down/dorado-*linux-x64/bin/dorado .",outputs =[".pixi/envs/default/down/dorado-*linux-x64/bin/dorado"], depends-on = ["download-tool"] }
+
+
+model-download = {cmd = "mkdir -p .pixi/envs/default/models/ && dorado download --model dna_r10.4.1_e8.2_400bps_sup@v5.2.0 --models-directory .pixi/envs/default/models/" ,depends-on =["setup-tool"]}
+
+[dependencies]
+curl ="*"
+tar ="*"
+samtools = ">=1.23.1,<2"
+nanocomp = ">=1.25.6,<2"
+kraken2 = ">=2.17.1,<3"
+bracken = ">=3.1,<4"
+cuda-toolkit = ">=13.2.1,<14"
