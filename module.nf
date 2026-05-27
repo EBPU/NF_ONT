@@ -71,6 +71,7 @@ done
 
 process METHYLATION_6mA {
 clusterOptions "--partition cuda --gres=gpu:1"
+containerOptions "--nv"
 publishDir 'methylation', mode:'copy'
 
 input:
@@ -80,7 +81,7 @@ output:
 	val 'done', emit:done
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_6mA@v1 --kit-name SQK-NBD114-96 > 6mA-met.bam
+dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_6mA@v1 --kit-name SQK-NBD114-96 > 6mA-met.bam
 """
 }
 
@@ -96,7 +97,7 @@ output:
 script:
 """
 mkdir -p excluded
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado demux --output-dir demuxed_6mA --kit-name SQK-NBD114-96 ${bam_file}
+dorado demux --output-dir demuxed_6mA --kit-name SQK-NBD114-96 ${bam_file}
 mv demuxed_6mA/*/*/*/*/*/*.bam .
 
 declare -A SAMPLE_MAP
@@ -149,7 +150,7 @@ output:
 
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
@@ -175,6 +176,7 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 
 process METHYLATION_4mC {
 clusterOptions "--partition cuda --gres=gpu:1"
+containerOptions "--nv"
 publishDir 'methylation', mode:'copy'
 
 input:
@@ -184,7 +186,7 @@ output:
 	val 'done', emit:done
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_4mC_5mC@v1 > 4mC_5m-met.bam
+dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_4mC_5mC@v1 > 4mC_5m-met.bam
 """
 }
 
@@ -200,7 +202,7 @@ output:
 script:
 """
 mkdir -p excluded
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado demux --output-dir demuxed_4mC --kit-name SQK-NBD114-96 ${bam_file}
+dorado demux --output-dir demuxed_4mC --kit-name SQK-NBD114-96 ${bam_file}
 mv demuxed_4mC/*/*/*/*/*/*.bam .
 
 declare -A SAMPLE_MAP
@@ -253,7 +255,7 @@ output:
 
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
@@ -279,6 +281,7 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 
 process METHYLATION_5mCG {
 clusterOptions "--partition cuda --gres=gpu:1"
+containerOptions "--nv"
 publishDir 'methylation', mode:'copy'
 
 input:
@@ -288,7 +291,7 @@ output:
 	val 'done', emit:done
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mCG_5hmCG@v2 > 5mCG_5hm-met.bam
+dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mCG_5hmCG@v2 > 5mCG_5hm-met.bam
 """
 }
 
@@ -304,7 +307,7 @@ output:
 script:
 """
 mkdir -p excluded
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado demux --output-dir demuxed_5mCG --kit-name SQK-NBD114-96 ${bam_file}
+dorado demux --output-dir demuxed_5mCG --kit-name SQK-NBD114-96 ${bam_file}
 mv demuxed_5mCG/*/*/*/*/*/*.bam .
 
 declare -A SAMPLE_MAP
@@ -358,7 +361,7 @@ output:
 
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
@@ -384,6 +387,7 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 
 process METHYLATION_5mC {
 clusterOptions "--partition cuda --gres=gpu:1"
+containerOptions "--nv"
 publishDir 'methylation', mode:'copy'
 
 input:
@@ -393,7 +397,7 @@ output:
 	val 'done', emit:done
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mC_5hmC@v2 > 5mC_5hmC-met.bam
+dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mC_5hmC@v2 > 5mC_5hmC-met.bam
 """
 }
 
@@ -409,7 +413,7 @@ output:
 script:
 """
 mkdir -p excluded
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado demux --output-dir demuxed_5mC --kit-name SQK-NBD114-96 ${bam_file}
+dorado demux --output-dir demuxed_5mC --kit-name SQK-NBD114-96 ${bam_file}
 mv demuxed_5mC/*/*/*/*/*/*.bam .
 
 declare -A SAMPLE_MAP
@@ -468,7 +472,7 @@ output:
 
 script:
 """
-/idle/ric.cirillo/zinola.alma/SOFTW/dorado-1.4.0-linux-x64/bin/dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
