@@ -20,7 +20,7 @@ From: ubuntu:22.04
 	mkdir /pixi_env
     cd /pixi_env
 	cp /opt/pixi-projects/pixi.toml .
-	pixi run model-download
+	pixi run model-download-all
     
    	export PATH="/pixi_env/.pixi/envs/default/bin:$PATH"
 
