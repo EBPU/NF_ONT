@@ -2,7 +2,7 @@ Bootstrap: docker
 From: ubuntu:22.04
 
 %files
-	tomls/ont_utilities/pixi.toml /opt/pixi-projects/pixi.toml
+	Tomls/pixi.toml /opt/pixi-projects/pixi.toml
 
 
 %post
