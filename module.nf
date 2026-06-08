@@ -1,8 +1,7 @@
 process BASECALLER {
-clusterOptions "--partition cuda --gres=gpu:1"
-containerOptions "--nv"
-publishDir 'basecall', mode:'copy'
-
+	clusterOptions "--partition cuda --gres=gpu:1"
+	containerOptions "--nv"
+	publishDir 'basecall', mode:'copy'
 input:
 	path pod5_dir
 	val kit
@@ -70,10 +69,9 @@ done
 }
 
 process METHYLATION_6mA {
-clusterOptions "--partition cuda --gres=gpu:1"
-containerOptions "--nv"
-publishDir 'methylation', mode:'copy'
-
+	clusterOptions "--partition cuda --gres=gpu:1"
+	containerOptions "--nv"
+	publishDir 'methylation', mode:'copy'
 input:
 	path pod5_dir
 output:
@@ -81,7 +79,7 @@ output:
 	val 'done', emit:done
 script:
 """
-dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_6mA@v1 --kit-name SQK-NBD114-96 > 6mA-met.bam
+dorado basecaller /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_6mA@v1 --kit-name SQK-NBD114-96 > 6mA-met.bam
 """
 }
 
@@ -137,37 +135,32 @@ done
 }
 
 process MAPPING_6mA{
-	conda "/idle/ric.cirillo/common_envs/conda/bcftools"
 	cpus 8
 	publishDir 'mapped_6mA', mode:'copy'
 	tag "$sample_id"
 input:
     tuple val(sample_id), path(bam_file)
-
+	path(ref)
 output:
 	tuple val(sample_id), path("${sample_id}.aligned.bam"), path("${sample_id}.aligned.bam.bai"), emit: bam
 	val 'done', emit: done
-
 script:
 """
-dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner ${ref} ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
 
 process MODKIT_6mA{
-	conda "/idle/ric.cirillo/common_envs/conda/modkit"
 	cpus 8
 	tag "$sample_id"
 	publishDir 'mapped_6mA', mode:'copy'
 input:
     tuple val(sample_id), path(bam_file), path(bai_file)
-
 output:
 	path("*.bedmethyl"), emit: bedmethyl
 	path("*.bedmethyl.log"), emit: log
 	val 'done', emit: done
-
 script:
 """
 modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-filepath ${sample_id}.bedmethyl.log
@@ -175,10 +168,9 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 }
 
 process METHYLATION_4mC {
-clusterOptions "--partition cuda --gres=gpu:1"
-containerOptions "--nv"
-publishDir 'methylation', mode:'copy'
-
+	clusterOptions "--partition cuda --gres=gpu:1"
+	containerOptions "--nv"
+	publishDir 'methylation', mode:'copy'
 input:
 	path pod5_dir
 output:
@@ -186,7 +178,7 @@ output:
 	val 'done', emit:done
 script:
 """
-dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_4mC_5mC@v1 > 4mC_5m-met.bam
+dorado basecaller /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_4mC_5mC@v1 > 4mC_5m-met.bam
 """
 }
 
@@ -242,37 +234,32 @@ done
 }
 
 process MAPPING_4mC{
-	conda "/idle/ric.cirillo/common_envs/conda/bcftools"
 	cpus 8
 	publishDir 'mapped_4mC', mode:'copy'
 	tag "$sample_id"
 input:
     tuple val(sample_id), path(bam_file)
-
+	path(ref)
 output:
 	tuple val(sample_id), path("${sample_id}.aligned.bam"), path("${sample_id}.aligned.bam.bai"), emit: bam
 	val 'done', emit: done
-
 script:
 """
-dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner ${ref} ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
 
 process MODKIT_4mC{
-	conda "/idle/ric.cirillo/common_envs/conda/modkit"
 	cpus 8
 	tag "$sample_id"
 	publishDir 'mapped_4mC', mode:'copy'
 input:
     tuple val(sample_id), path(bam_file), path(bai_file)
-
 output:
 	path("*.bedmethyl"), emit: bedmethyl
 	path("*.bedmethyl.log"), emit: log
 	val 'done', emit: done
-
 script:
 """
 modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-filepath ${sample_id}.bedmethyl.log
@@ -280,10 +267,9 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 }
 
 process METHYLATION_5mCG {
-clusterOptions "--partition cuda --gres=gpu:1"
-containerOptions "--nv"
-publishDir 'methylation', mode:'copy'
-
+	clusterOptions "--partition cuda --gres=gpu:1"
+	containerOptions "--nv"
+	publishDir 'methylation', mode:'copy'
 input:
 	path pod5_dir
 output:
@@ -291,7 +277,7 @@ output:
 	val 'done', emit:done
 script:
 """
-dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mCG_5hmCG@v2 > 5mCG_5hm-met.bam
+dorado basecaller /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mCG_5hmCG@v2 > 5mCG_5hm-met.bam
 """
 }
 
@@ -348,37 +334,32 @@ done
 }
 
 process MAPPING_5mCG{
-	conda "/idle/ric.cirillo/common_envs/conda/bcftools"
 	cpus 8
 	publishDir 'mapped_5mCG', mode:'copy'
 	tag "$sample_id"
 input:
     tuple val(sample_id), path(bam_file)
-
+	path(ref)
 output:
 	tuple val(sample_id), path("${sample_id}.aligned.bam"), path("${sample_id}.aligned.bam.bai"), emit: bam
 	val 'done', emit: done
-
 script:
 """
-dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner ${ref} ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
 
 process MODKIT_5mCG{
-	conda "/idle/ric.cirillo/common_envs/conda/modkit"
 	cpus 8
 	tag "$sample_id"
 	publishDir 'mapped_5mCG', mode:'copy'
 input:
     tuple val(sample_id), path(bam_file), path(bai_file)
-
 output:
 	path("*.bedmethyl"), emit: bedmethyl
 	path("*.bedmethyl.log"), emit: log
 	val 'done', emit: done
-
 script:
 """
 modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-filepath ${sample_id}.bedmethyl.log
@@ -386,10 +367,9 @@ modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-fi
 }
 
 process METHYLATION_5mC {
-clusterOptions "--partition cuda --gres=gpu:1"
-containerOptions "--nv"
-publishDir 'methylation', mode:'copy'
-
+	clusterOptions "--partition cuda --gres=gpu:1"
+	containerOptions "--nv"
+	publishDir 'methylation', mode:'copy'
 input:
 	path pod5_dir
 output:
@@ -397,7 +377,7 @@ output:
 	val 'done', emit:done
 script:
 """
-dorado basecaller /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /idle/ric.cirillo/zinola.alma/SOFTW/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mC_5hmC@v2 > 5mC_5hmC-met.bam
+dorado basecaller /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0 pod5/ --modified-bases-models /pixi_env/.pixi/envs/default/models/dna_r10.4.1_e8.2_400bps_sup@v5.2.0_5mC_5hmC@v2 > 5mC_5hmC-met.bam
 """
 }
 
@@ -459,37 +439,32 @@ done
 }
 
 process MAPPING_5mC{
-	conda "/idle/ric.cirillo/common_envs/conda/bcftools"
 	cpus 8
 	publishDir 'mapped_5mC', mode:'copy'
 	tag "$sample_id"
 input:
     tuple val(sample_id), path(bam_file)
-
+	path(ref)
 output:
 	tuple val(sample_id), path("${sample_id}.aligned.bam"), path("${sample_id}.aligned.bam.bai"), emit: bam
 	val 'done', emit: done
-
 script:
 """
-dorado aligner /beegfs/datasets/buffer/ric.cirillo/MTB/M._tuberculosis_H37Rv_2015-11-13.fasta ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
+dorado aligner ${ref} ${bam_file} | samtools sort -o "${sample_id}.aligned.bam"
 samtools index "${sample_id}.aligned.bam"
 """
 }
 
 process MODKIT_5mC{
-	conda "/idle/ric.cirillo/common_envs/conda/modkit"
 	cpus 8
 	tag "$sample_id"
 	publishDir 'mapped_5mC', mode:'copy'
 input:
     tuple val(sample_id), path(bam_file), path(bai_file)
-
 output:
 	path("*.bedmethyl"), emit: bedmethyl
 	path("*.bedmethyl.log"), emit: log
 	val 'done', emit: done
-
 script:
 """
 modkit pileup ${bam_file} ${sample_id}.bedmethyl --threads ${task.cpus} --log-filepath ${sample_id}.bedmethyl.log
@@ -519,7 +494,6 @@ process KRAKEN{
 input:
     tuple val(replicateId), path(fastq_gz)
 	path kraken_db
-
 output:
     tuple val(replicateId), path("${replicateId}.kreport"), emit: kraken
     val 'done', emit: done
@@ -532,10 +506,9 @@ mv kraken/*.kreport .
 }
 
 process BRACKEN {
-cpus 16
-tag "$replicateId"
-publishDir "bracken", mode:"copy"
-
+	cpus 16
+	tag "$replicateId"
+	publishDir "bracken", mode:"copy"
 input:
     tuple val(replicateId), path(kreport)
 	path kraken_db
@@ -554,14 +527,11 @@ mv bracken/* .
 process COVERAGE {
     cpus 2
     publishDir 'coverage', mode: 'copy'
-
 input:
 	path fastq_gz
 	val genome_size
-
 output:
 	path "coverage.tsv", emit: coverage_table
-
 script:
 """
 GENOME_SIZE=${genome_size}
@@ -583,18 +553,14 @@ done
 
 
 process FINAL_REPORT {
-
     publishDir 'output', mode: 'copy'
-
-    input:
-        path nanostats
-        path coverage_table
-        path bracken_bout
-
-    output:
-        path "Final_Report.tsv"
-
-    script:
+input:
+	path nanostats
+	path coverage_table
+	path bracken_bout
+output:
+	path "Final_Report.tsv"
+script:
     """
     set -euo pipefail
 

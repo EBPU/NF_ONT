@@ -16,6 +16,7 @@ nextflow.enable.dsl = 2
     params.mapping_4mC = false
     params.mapping_5mCG = false
     params.mapping_5mC = false
+    params.ref = "$baseDir/REF/M.tuberculosis_reference_H37Rv.fasta"
     params.list = params.list ?: "$baseDir/samples.csv"
 
 include {
@@ -62,7 +63,7 @@ workflow {
         basecaller_out_6mA=METHYLATION_6mA(params.pod5)
         demux_6mA_out = DEMULTIPLEX_6mA(basecaller_out_6mA.bam,samp_ch) 
         if (params.mapping_6mA){
-            mapped_6mA_out = MAPPING_6mA(demux_6mA_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_6mA_out = MAPPING_6mA(demux_6mA_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_6mA(mapped_6mA_out.bam)
         }
     }
@@ -70,7 +71,7 @@ workflow {
         basecaller_out_4mC=METHYLATION_4mC(params.pod5)
         DEMULTIPLEX_4mC(basecaller_out_4mC.bam,samp_ch)
         if (params.mapping_4mC){
-            mapped_4mC_out = MAPPING_4mC(demux_4mC_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_4mC_out = MAPPING_4mC(demux_4mC_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_4mC(mapped_4mC_out.bam)
         }
     }
@@ -78,7 +79,7 @@ workflow {
         basecaller_out_5mCG=METHYLATION_5mCG(params.pod5)
         DEMULTIPLEX_5mCG(basecaller_out_5mCG.bam,samp_ch)
         if (params.mapping_5mCG){
-            mapped_5mCG_out = MAPPING_5mCG(demux_5mCG_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_5mCG_out = MAPPING_5mCG(demux_5mCG_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_5mCG(mapped_5mCG_out.bam)
         }
     }
@@ -86,7 +87,7 @@ workflow {
         basecaller_out_5mC=METHYLATION_5mC(params.pod5)
         DEMULTIPLEX_5mC(basecaller_out_5mC.bam,samp_ch)
         if (params.mapping_5mC){
-            mapped_5mC_out = MAPPING_5mC(demux_5mC_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_5mC_out = MAPPING_5mC(demux_5mC_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_5mC(mapped_5mC_out.bam)
         }
     }
