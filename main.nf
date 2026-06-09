@@ -44,6 +44,9 @@ include {
     BRACKEN;
     FINAL_REPORT
 	} from "$baseDir/module.nf"
+log.info """
+params.ref = $params.ref
+"""
 workflow {
     samp_ch = Channel.fromPath(params.list)
     basecaller_out = BASECALLER(params.pod5,params.kit)
