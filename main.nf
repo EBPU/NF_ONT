@@ -16,7 +16,7 @@ nextflow.enable.dsl = 2
     params.mapping_4mC = false
     params.mapping_5mCG = false
     params.mapping_5mC = false
-    params.ref = "$baseDir/REF/M.tuberculosis_reference_H37Rv.fasta"
+    params.ref = file("$baseDir/REF/M.tuberculosis_reference_H37Rv.fasta")
     params.list = params.list ?: "$baseDir/samples.csv"
 
 include {
