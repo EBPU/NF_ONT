@@ -3,18 +3,19 @@ nextflow.enable.dsl = 2
  * Define the default parameters
  */ 
 	params.pod5	= "$baseDir/pod5/"
+	params.kit = "SQK-NBD114-96"
 	params.results	= "OUTPUT"
-	params.ref = "$baseDir"
     params.run_6mA = false
     params.run_4mC = false
     params.run_5mCG = false
     params.run_5mC = false
     params.genome_size = 4411529
-    kraken_db = "standard_db"
+    kraken_db = ""
     params.mapping_6mA = false
     params.mapping_4mC = false
     params.mapping_5mCG = false
     params.mapping_5mC = false
+    params.ref = file("$baseDir/REF/M.tuberculosis_reference_H37Rv.fasta")
     params.list = params.list ?: "$baseDir/samples.csv"
 
 include {
@@ -42,9 +43,25 @@ include {
     BRACKEN;
     FINAL_REPORT
 	} from "$baseDir/module.nf"
+log.info """
+reads: $params.pod5
+samples name: $params.list
+kit: $params.kit
+result directory: $params.results
+reference used: $params.ref
+genome size: $params.genome_size
+methylation analysis 6mA: $params.run_6mA
+methylation analysis 4mC: $params.run_4mC
+methylation analysis 5mCG: $params.run_5mCG
+methylation analysis 5mC: $params.run_5mC
+methylation mapping 6mA: $params.mapping_6mA
+methylation mapping 4mC: $params.mapping_4mC
+methylation mapping 5mCG: $params.mapping_5mCG
+methylation mapping 5mC: $params.mapping_5mC
+"""
 workflow {
     samp_ch = Channel.fromPath(params.list)
-    basecaller_out = BASECALLER(params.pod5)
+    basecaller_out = BASECALLER(params.pod5,params.kit)
     demultiplex_out = DEMULTIPLEX(basecaller_out.bam,samp_ch)
     reads_with_id = demultiplex_out.fastq_gz
     .flatten()
@@ -61,7 +78,7 @@ workflow {
         basecaller_out_6mA=METHYLATION_6mA(params.pod5)
         demux_6mA_out = DEMULTIPLEX_6mA(basecaller_out_6mA.bam,samp_ch) 
         if (params.mapping_6mA){
-            mapped_6mA_out = MAPPING_6mA(demux_6mA_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_6mA_out = MAPPING_6mA(demux_6mA_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_6mA(mapped_6mA_out.bam)
         }
     }
@@ -69,7 +86,7 @@ workflow {
         basecaller_out_4mC=METHYLATION_4mC(params.pod5)
         DEMULTIPLEX_4mC(basecaller_out_4mC.bam,samp_ch)
         if (params.mapping_4mC){
-            mapped_4mC_out = MAPPING_4mC(demux_4mC_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_4mC_out = MAPPING_4mC(demux_4mC_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_4mC(mapped_4mC_out.bam)
         }
     }
@@ -77,7 +94,7 @@ workflow {
         basecaller_out_5mCG=METHYLATION_5mCG(params.pod5)
         DEMULTIPLEX_5mCG(basecaller_out_5mCG.bam,samp_ch)
         if (params.mapping_5mCG){
-            mapped_5mCG_out = MAPPING_5mCG(demux_5mCG_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_5mCG_out = MAPPING_5mCG(demux_5mCG_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_5mCG(mapped_5mCG_out.bam)
         }
     }
@@ -85,7 +102,7 @@ workflow {
         basecaller_out_5mC=METHYLATION_5mC(params.pod5)
         DEMULTIPLEX_5mC(basecaller_out_5mC.bam,samp_ch)
         if (params.mapping_5mC){
-            mapped_5mC_out = MAPPING_5mC(demux_5mC_out.bam.flatten().map { file -> tuple(file.baseName, file)})
+            mapped_5mC_out = MAPPING_5mC(demux_5mC_out.bam.flatten().map { file -> tuple(file.baseName, file)},params.ref)
             MODKIT_5mC(mapped_5mC_out.bam)
         }
     }
