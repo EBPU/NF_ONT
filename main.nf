@@ -5,7 +5,6 @@ nextflow.enable.dsl = 2
 	params.pod5	= "$baseDir/pod5/"
 	params.kit = "SQK-NBD114-96"
 	params.results	= "OUTPUT"
-	params.ref = "$baseDir"
     params.run_6mA = false
     params.run_4mC = false
     params.run_5mCG = false
