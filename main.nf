@@ -44,7 +44,20 @@ include {
     FINAL_REPORT
 	} from "$baseDir/module.nf"
 log.info """
-params.ref = $params.ref
+reads: $params.pod5
+samples name: $params.list
+kit: $params.kit
+result directory: $params.results
+reference used: $params.ref
+genome size: $params.genome_size
+methylation analysis 6mA: $params.run_6mA
+methylation analysis 4mC: $params.run_4mC
+methylation analysis 5mCG: $params.run_5mCG
+methylation analysis 5mC: $params.run_5mC
+methylation mapping 6mA: $params.mapping_6mA
+methylation mapping 4mC: $params.mapping_4mC
+methylation mapping 5mCG: $params.mapping_5mCG
+methylation mapping 5mC: $params.mapping_5mC
 """
 workflow {
     samp_ch = Channel.fromPath(params.list)
