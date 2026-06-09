@@ -31,7 +31,7 @@ pod5/
 
 ### 2. Sample Sheet
 
-A sample sheet provided through the `--list` parameter.
+A sample sheet provided through the `params.list` parameter.
 
 The file must contain barcode-to-sample associations separated by semicolons (`;`):
 
