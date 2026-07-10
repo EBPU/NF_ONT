@@ -22,7 +22,6 @@ input:
 	path samp_csv
 output:
     path("*.fastq.gz"), emit: fastq_gz
-	//tuple val(sample_id), path("*.fastq.gz"), emit: fastq_gz
     val 'done', emit: done
 script:
 """
@@ -37,34 +36,35 @@ while IFS=';' read -r bc_num sample_name; do
 	[[ -z "\$bc_num" || -z "\$sample_name" ]] && continue
 	SAMPLE_MAP["\$bc_num"]="\$sample_name"
 done < ${samp_csv}
+shopt -s nullglob
+
 for fq in *.fastq; do
-	[[ -e "\$fq" ]] || continue          # glob miss guard
+    if [[ "\$fq" == *unknown* ]]; then
+        mv "\$fq" excluded/
+        continue
+    fi
 
-	if [[ "\$fq" == *unknown* ]]; then
-		mv "\$fq" excluded/
-		continue
-	fi
+    if [[ "\$fq" =~ barcode([0-9]+) ]]; then
+        bc_num="\${BASH_REMATCH[1]}"
+        bc_num=\$(printf '%02d' "\$((10#\$bc_num))")
+    else
+        mv "\$fq" excluded/
+        continue
+    fi
 
+    sample_name="\${SAMPLE_MAP[\$bc_num]:-}"
 
-	if [[ "\$fq" =~ barcode([0-9]+) ]]; then
-		bc_num="\${BASH_REMATCH[1]}"
-		bc_num=\$(printf '%02d' "\$((10#\$bc_num))")
-	else
-		mv "\$fq" excluded/
-		continue
-	fi
+    if [[ -z "\$sample_name" ]]; then
+        mv "\$fq" excluded/
+        continue
+    fi
 
-	sample_name="\${SAMPLE_MAP[\$bc_num]:-}"
+    out_file="\${sample_name}-barcode\${bc_num}.fastq"
 
-	if [[ -z "\$sample_name" ]]; then
-		mv "\$fq" excluded/
-		continue
-	fi
-
-	new_name="\${sample_name}-barcode\${bc_num}.fastq"
-	mv "\$fq" "\$new_name"
-	gzip "\$new_name"          
+    cat "\$fq" >> "\$out_file"
+	rm \$fq
 done
+gzip *fastq
 """
 }
 
@@ -544,7 +544,8 @@ for f in ${fastq_gz}; do
 
 	bases=\$(zcat \$f | awk 'NR%4==2 {total += length(\$0)} END {print total}')
 
-	coverage=\$(echo "scale=4; \$bases / \$GENOME_SIZE" | bc)
+	#coverage=\$(echo "scale=4; \$bases / \$GENOME_SIZE" | bc)
+	coverage=\$(awk -v b=\$bases -v g=\$GENOME_SIZE 'BEGIN {printf "%.4f", b/g}')
 
 	echo -e "\$f\t\$coverage" >> coverage.tsv
 done
