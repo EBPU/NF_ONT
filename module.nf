@@ -107,7 +107,7 @@ while IFS=';' read -r bc_num sample_name; do
 done < ${samp_csv}
 shopt -s nullglob
 
-for fq in *. bam; do
+for fq in *.bam; do
     if [[ "\$fq" == *unknown* ]]; then
         mv "\$fq" excluded/
         continue
@@ -128,7 +128,7 @@ for fq in *. bam; do
         continue
     fi
 
-    out_file="\${sample_name}-barcode\${bc_num}. bam"
+    out_file="\${sample_name}-barcode\${bc_num}.bam"
 
     cat "\$fq" >> "\$out_file"
 	rm \$fq
