@@ -94,8 +94,8 @@ output:
     val 'done', emit: done
 script:
 """
-mkdir -p excluded
-dorado demux --output-dir demuxed_6mA --kit-name SQK-NBD114-96 ${bam_file}
+mkdir -p excluded/
+dorado demux --output-dir demuxed_6mA --kit-name SQK-NBD114-96 ${bam_file} 
 mv demuxed_6mA/*/*/*/*/*/*.bam .
 
 declare -A SAMPLE_MAP
@@ -105,32 +105,35 @@ while IFS=';' read -r bc_num sample_name; do
 	[[ -z "\$bc_num" || -z "\$sample_name" ]] && continue
 	SAMPLE_MAP["\$bc_num"]="\$sample_name"
 done < ${samp_csv}
-for fq in *.bam; do
-	[[ -e "\$fq" ]] || continue          
+shopt -s nullglob
 
-	if [[ "\$fq" == *unknown* ]]; then
-		mv "\$fq" excluded/
-		continue
-	fi
+for fq in *. bam; do
+    if [[ "\$fq" == *unknown* ]]; then
+        mv "\$fq" excluded/
+        continue
+    fi
 
-	if [[ "\$fq" =~ barcode([0-9]+) ]]; then
-		bc_num="\${BASH_REMATCH[1]}"
-		bc_num=\$(printf '%02d' "\$((10#\$bc_num))")
-	else
-		mv "\$fq" excluded/
-		continue
-	fi
+    if [[ "\$fq" =~ barcode([0-9]+) ]]; then
+        bc_num="\${BASH_REMATCH[1]}"
+        bc_num=\$(printf '%02d' "\$((10#\$bc_num))")
+    else
+        mv "\$fq" excluded/
+        continue
+    fi
 
-	sample_name="\${SAMPLE_MAP[\$bc_num]:-}"
+    sample_name="\${SAMPLE_MAP[\$bc_num]:-}"
 
-	if [[ -z "\$sample_name" ]]; then
-		mv "\$fq" excluded/
-		continue
-	fi
+    if [[ -z "\$sample_name" ]]; then
+        mv "\$fq" excluded/
+        continue
+    fi
 
-	new_name="\${sample_name}-barcode\${bc_num}.bam"
-	mv "\$fq" "\$new_name"
+    out_file="\${sample_name}-barcode\${bc_num}. bam"
+
+    cat "\$fq" >> "\$out_file"
+	rm \$fq
 done
+
 """
 }
 
